@@ -1,0 +1,1 @@
+self.__SSG_MANIFEST=new Set(["\u002Fpoem\u002F[poet]\u002F[poem]"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()

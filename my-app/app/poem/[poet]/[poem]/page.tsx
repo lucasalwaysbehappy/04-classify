@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { readFileSync, readdirSync } from "fs";
 import { join } from "path";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -9,6 +9,28 @@ interface PoemPageProps {
     poet: string;
     poem: string;
   }>;
+}
+
+// Generate static params for all poems
+export async function generateStaticParams() {
+  const contentPath = join(process.cwd(), "content");
+  const poets = readdirSync(contentPath, { withFileTypes: true })
+    .filter((dirent) => dirent.isDirectory() && !dirent.name.endsWith(".json"))
+    .map((dirent) => dirent.name);
+
+  const params: { poet: string; poem: string }[] = [];
+
+  for (const poet of poets) {
+    const poems = readdirSync(join(contentPath, poet), { withFileTypes: true })
+      .filter((dirent) => dirent.isDirectory())
+      .map((dirent) => dirent.name);
+
+    for (const poem of poems) {
+      params.push({ poet, poem });
+    }
+  }
+
+  return params;
 }
 
 // Simple markdown parser
