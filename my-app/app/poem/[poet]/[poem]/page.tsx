@@ -3,6 +3,7 @@ import { join } from "path";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
 
 interface PoemPageProps {
   params: Promise<{
@@ -31,6 +32,56 @@ export async function generateStaticParams() {
   }
 
   return params;
+}
+
+// Generate dynamic metadata
+export async function generateMetadata({ params }: PoemPageProps): Promise<Metadata> {
+  const { poet, poem } = await params;
+  const decodedPoet = decodeURIComponent(poet);
+  const decodedPoem = decodeURIComponent(poem);
+
+  // Get poem data from index
+  const indexData = JSON.parse(
+    readFileSync(join(process.cwd(), "content", "index.json"), "utf-8")
+  );
+  const poetData = indexData.poets.find((p: { name: string }) => p.name === decodedPoet);
+  const poemData = poetData?.poems.find((p: { slug: string }) => p.slug === decodedPoem);
+
+  if (!poemData) {
+    return {
+      title: "诗词未找到 - 中华诗词",
+    };
+  }
+
+  const title = `${poemData.title} - ${decodedPoet} | 中华诗词`;
+  const description = `${poemData.title}是${decodedPoet}创作于${poemData.year}年的经典诗词。${poemData.tags.join("、")}。`;
+
+  return {
+    title,
+    description,
+    keywords: [poemData.title, decodedPoet, ...poemData.tags, "古诗词", "诗词鉴赏"],
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      locale: "zh_CN",
+      authors: [decodedPoet],
+      images: [
+        {
+          url: poemData.image,
+          width: 800,
+          height: 600,
+          alt: poemData.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [poemData.image],
+    },
+  };
 }
 
 // Simple markdown parser
@@ -100,37 +151,41 @@ export default async function PoemPage({ params }: PoemPageProps) {
   return (
     <main className="min-h-screen bg-stone-50">
       {/* Navigation */}
-      <nav className="bg-stone-900 text-stone-50 py-4 px-4">
-        <div className="max-w-4xl mx-auto">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-stone-900/95 backdrop-blur-sm text-stone-50 py-4 px-4 border-b border-stone-800">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link
             href="/"
-            className="text-stone-300 hover:text-white transition-colors inline-flex items-center gap-2"
+            className="text-stone-300 hover:text-white transition-colors inline-flex items-center gap-2 text-sm"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             返回首页
           </Link>
+          <div className="text-sm text-stone-400">
+            {decodedPoet} · {poemData?.year}
+          </div>
         </div>
       </nav>
 
       {/* Hero Image */}
       {imageUrl && (
-        <div className="relative h-64 md:h-96 w-full">
+        <div className="relative h-80 md:h-[500px] w-full">
           <Image
             src={imageUrl}
             alt={title}
             fill
+            sizes="100vw"
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8">
+          <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/50 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
             <div className="max-w-4xl mx-auto">
-              <h1 className="text-3xl md:text-5xl font-bold text-white mb-2">
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-3 leading-tight">
                 {title}
               </h1>
-              <p className="text-stone-300 text-lg">{author.replace(/\*\*/g, "")}</p>
+              <p className="text-stone-300 text-lg md:text-xl">{author.replace(/\*\*/g, "")}</p>
             </div>
           </div>
         </div>
@@ -138,77 +193,96 @@ export default async function PoemPage({ params }: PoemPageProps) {
 
       {/* Content */}
       <article className="py-12 px-4">
-        <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-12">
-          <div className="prose prose-stone max-w-none">
-            {sections.map((section, index) => {
-              switch (section.type) {
-                case "h1":
-                  return null; // Skip h1 as it's in hero
-                case "h2":
-                  return (
-                    <h2
-                      key={index}
-                      className="text-2xl font-bold text-stone-800 mt-8 mb-4 pb-2 border-b border-stone-200"
-                    >
-                      {section.content}
-                    </h2>
-                  );
-                case "h3":
-                  return (
-                    <h3
-                      key={index}
-                      className="text-xl font-semibold text-stone-700 mt-6 mb-3"
-                    >
-                      {section.content}
-                    </h3>
-                  );
-                case "blockquote":
-                  return (
-                    <blockquote
-                      key={index}
-                      className="border-l-4 border-stone-400 pl-4 my-6 text-stone-700 italic text-lg leading-relaxed"
-                    >
-                      {section.content}
-                    </blockquote>
-                  );
-                case "bold":
-                  return (
-                    <p
-                      key={index}
-                      className="font-semibold text-stone-800 my-4 text-lg"
-                    >
-                      {section.content}
-                    </p>
-                  );
-                case "hr":
-                  return <hr key={index} className="my-8 border-stone-200" />;
-                case "tags":
-                  const tags = section.content.match(/#([^\s#]+)/g) || [];
-                  return (
-                    <div key={index} className="mt-8 pt-4 border-t border-stone-200">
-                      <div className="flex flex-wrap gap-2">
-                        {tags.map((tag, i) => (
-                          <span
-                            key={i}
-                            className="px-3 py-1 bg-stone-100 text-stone-600 text-sm rounded-full"
-                          >
-                            {tag.replace("#", "")}
-                          </span>
-                        ))}
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-3xl shadow-xl p-6 md:p-12 border border-stone-100">
+            <div className="prose prose-stone prose-lg max-w-none">
+              {sections.map((section, index) => {
+                switch (section.type) {
+                  case "h1":
+                    return null;
+                  case "h2":
+                    return (
+                      <h2
+                        key={index}
+                        className="text-2xl md:text-3xl font-bold text-stone-800 mt-12 mb-6 pb-4 border-b-2 border-stone-100"
+                      >
+                        {section.content}
+                      </h2>
+                    );
+                  case "h3":
+                    return (
+                      <h3
+                        key={index}
+                        className="text-xl md:text-2xl font-semibold text-stone-700 mt-8 mb-4"
+                      >
+                        {section.content}
+                      </h3>
+                    );
+                  case "blockquote":
+                    return (
+                      <blockquote
+                        key={index}
+                        className="border-l-4 border-stone-400 pl-6 my-8 text-stone-700 italic text-xl leading-relaxed bg-stone-50 py-4 pr-4 rounded-r-lg"
+                      >
+                        {section.content}
+                      </blockquote>
+                    );
+                  case "bold":
+                    return (
+                      <p
+                        key={index}
+                        className="font-semibold text-stone-800 my-6 text-xl"
+                      >
+                        {section.content}
+                      </p>
+                    );
+                  case "hr":
+                    return <hr key={index} className="my-10 border-stone-200" />;
+                  case "tags":
+                    const tags = section.content.match(/#([^\s#]+)/g) || [];
+                    return (
+                      <div key={index} className="mt-10 pt-6 border-t border-stone-200">
+                        <h4 className="text-sm font-medium text-stone-500 mb-3">标签</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {tags.map((tag, i) => (
+                            <span
+                              key={i}
+                              className="px-4 py-2 bg-stone-100 text-stone-700 text-sm rounded-full hover:bg-stone-200 transition-colors cursor-pointer"
+                            >
+                              {tag.replace("#", "")}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  );
-                default:
-                  return (
-                    <p
-                      key={index}
-                      className="text-stone-600 leading-relaxed my-4"
-                    >
-                      {section.content.replace(/\*\*/g, "")}
-                    </p>
-                  );
-              }
-            })}
+                    );
+                  default:
+                    return (
+                      <p
+                        key={index}
+                        className="text-stone-600 leading-relaxed my-4 text-lg"
+                      >
+                        {section.content.replace(/\*\*/g, "")}
+                      </p>
+                    );
+                }
+              })}
+            </div>
+          </div>
+
+          {/* Related Links */}
+          <div className="mt-8 flex justify-between items-center">
+            <Link
+              href={`/#${poetData?.dynasty}`}
+              className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H19v-2z" />
+              </svg>
+              返回{poetData?.dynasty}
+            </Link>
+            <div className="text-stone-400 text-sm">
+              分享诗词
+            </div>
           </div>
         </div>
       </article>

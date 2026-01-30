@@ -1,0 +1,10 @@
+.git
+.github
+.vscode
+*.log
+*.md
+!README.md
+node_modules
+.env
+.env.local
+.DS_Store
