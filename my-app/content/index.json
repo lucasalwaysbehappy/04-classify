@@ -1,60 +1,95 @@
 {
+  "dynasties": [
+    {
+      "name": "唐代",
+      "period": "618-907",
+      "order": 1
+    },
+    {
+      "name": "宋代", 
+      "period": "960-1279",
+      "order": 2
+    }
+  ],
   "poets": [
-    {
-      "name": "李白",
-      "dynasty": "唐代",
-      "avatar": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400",
-      "poems": [
-        {
-          "slug": "静夜思",
-          "title": "静夜思",
-          "image": "https://images.unsplash.com/photo-1532978379173-523e16f371f2?w=800",
-          "tags": ["思乡", "月亮", "唐代"]
-        },
-        {
-          "slug": "将进酒",
-          "title": "将进酒",
-          "image": "https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?w=800",
-          "tags": ["豪放", "饮酒", "自信", "唐代"]
-        }
-      ]
-    },
-    {
-      "name": "苏轼",
-      "dynasty": "宋代",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
-      "poems": [
-        {
-          "slug": "水调歌头",
-          "title": "水调歌头·明月几时有",
-          "image": "https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5?w=800",
-          "tags": ["中秋", "月亮", "哲理", "宋代", "思念"]
-        }
-      ]
-    },
     {
       "name": "王维",
       "dynasty": "唐代",
+      "dynastyOrder": 1,
+      "lifePeriod": "701-761",
       "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400",
       "poems": [
         {
           "slug": "山居秋暝",
           "title": "山居秋暝",
           "image": "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=800",
-          "tags": ["山水", "田园", "隐居", "唐代", "禅意"]
+          "tags": ["山水", "田园", "隐居", "唐代", "禅意"],
+          "year": "约740",
+          "period": "中晚年",
+          "order": 1
+        }
+      ]
+    },
+    {
+      "name": "李白",
+      "dynasty": "唐代",
+      "dynastyOrder": 1,
+      "lifePeriod": "701-762",
+      "avatar": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400",
+      "poems": [
+        {
+          "slug": "静夜思",
+          "title": "静夜思",
+          "image": "https://images.unsplash.com/photo-1532978379173-523e16f371f2?w=800",
+          "tags": ["思乡", "月亮", "唐代"],
+          "year": "约726",
+          "period": "青年时期（26岁）",
+          "order": 1
+        },
+        {
+          "slug": "将进酒",
+          "title": "将进酒",
+          "image": "https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?w=800",
+          "tags": ["豪放", "饮酒", "自信", "唐代"],
+          "year": "约752",
+          "period": "长安放还后（52岁）",
+          "order": 2
         }
       ]
     },
     {
       "name": "杜甫",
       "dynasty": "唐代",
+      "dynastyOrder": 1,
+      "lifePeriod": "712-770",
       "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
       "poems": [
         {
           "slug": "春望",
           "title": "春望",
           "image": "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800",
-          "tags": ["爱国", "战乱", "忧国忧民", "唐代"]
+          "tags": ["爱国", "战乱", "忧国忧民", "唐代"],
+          "year": "757",
+          "period": "安史之乱中（46岁）",
+          "order": 3
+        }
+      ]
+    },
+    {
+      "name": "苏轼",
+      "dynasty": "宋代",
+      "dynastyOrder": 2,
+      "lifePeriod": "1037-1101",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+      "poems": [
+        {
+          "slug": "水调歌头",
+          "title": "水调歌头·明月几时有",
+          "image": "https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5?w=800",
+          "tags": ["中秋", "月亮", "哲理", "宋代", "思念"],
+          "year": "1076",
+          "period": "密州任上（40岁）",
+          "order": 1
         }
       ]
     }
