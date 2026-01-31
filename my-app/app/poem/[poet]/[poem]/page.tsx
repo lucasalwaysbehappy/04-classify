@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
+import { ThemeToggle } from "@/app/components/theme-toggle";
+import { ShareButtonWrapper } from "./share-button-wrapper";
 
 interface PoemPageProps {
   params: Promise<{
@@ -12,7 +14,6 @@ interface PoemPageProps {
   }>;
 }
 
-// Generate static params for all poems
 export async function generateStaticParams() {
   const contentPath = join(process.cwd(), "content");
   const poets = readdirSync(contentPath, { withFileTypes: true })
@@ -34,13 +35,11 @@ export async function generateStaticParams() {
   return params;
 }
 
-// Generate dynamic metadata
 export async function generateMetadata({ params }: PoemPageProps): Promise<Metadata> {
   const { poet, poem } = await params;
   const decodedPoet = decodeURIComponent(poet);
   const decodedPoem = decodeURIComponent(poem);
 
-  // Get poem data from index
   const indexData = JSON.parse(
     readFileSync(join(process.cwd(), "content", "index.json"), "utf-8")
   );
@@ -54,7 +53,7 @@ export async function generateMetadata({ params }: PoemPageProps): Promise<Metad
   }
 
   const title = `${poemData.title} - ${decodedPoet} | 中华诗词`;
-  const description = `${poemData.title}是${decodedPoet}创作于${poemData.year}年的经典诗词。${poemData.tags.join("、")}。`;
+  const description = `${poemData.title}是${decodedPoet}创作于${poemData.year}年的经典诗词。${poemData.tags.join("。")}。`;
 
   return {
     title,
@@ -66,28 +65,14 @@ export async function generateMetadata({ params }: PoemPageProps): Promise<Metad
       type: "article",
       locale: "zh_CN",
       authors: [decodedPoet],
-      images: [
-        {
-          url: poemData.image,
-          width: 800,
-          height: 600,
-          alt: poemData.title,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [poemData.image],
+      images: [{ url: poemData.image, width: 800, height: 600, alt: poemData.title }],
     },
   };
 }
 
-// Simple markdown parser
 function parseMarkdown(content: string) {
   const lines = content.split("\n");
-  const sections: { type: string; content: string; level?: number }[] = [];
+  const sections: { type: string; content: string }[] = [];
 
   for (const line of lines) {
     const trimmed = line.trim();
@@ -121,13 +106,7 @@ export default async function PoemPage({ params }: PoemPageProps) {
   const decodedPoet = decodeURIComponent(poet);
   const decodedPoem = decodeURIComponent(poem);
 
-  const contentPath = join(
-    process.cwd(),
-    "content",
-    decodedPoet,
-    decodedPoem,
-    "intro.md"
-  );
+  const contentPath = join(process.cwd(), "content", decodedPoet, decodedPoem, "intro.md");
 
   let content: string;
   try {
@@ -139,19 +118,24 @@ export default async function PoemPage({ params }: PoemPageProps) {
   const sections = parseMarkdown(content);
   const title = sections.find((s) => s.type === "h1")?.content || decodedPoem;
   const author = sections.find((s) => s.type === "paragraph" && s.content.includes("作者"))?.content || "";
+  
+  // Extract poem lines from blockquotes for sharing
+  const poemLines = sections
+    .filter((s) => s.type === "blockquote")
+    .flatMap((s) => s.content.split(/[，。、]/).filter((line) => line.trim()));
 
-  // Get image from index.json
   const indexData = JSON.parse(
     readFileSync(join(process.cwd(), "content", "index.json"), "utf-8")
   );
   const poetData = indexData.poets.find((p: { name: string }) => p.name === decodedPoet);
   const poemData = poetData?.poems.find((p: { slug: string }) => p.slug === decodedPoem);
   const imageUrl = poemData?.image || "";
+  const tags = poemData?.tags || [];
 
   return (
-    <main className="min-h-screen bg-stone-50">
+    <main className="min-h-screen bg-stone-50 dark:bg-stone-950 transition-colors duration-300">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-stone-900/95 backdrop-blur-sm text-stone-50 py-4 px-4 border-b border-stone-800">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-stone-900/95 dark:bg-black/95 backdrop-blur-sm text-stone-50 py-4 px-4 border-b border-stone-800">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link
             href="/"
@@ -165,6 +149,7 @@ export default async function PoemPage({ params }: PoemPageProps) {
           <div className="text-sm text-stone-400">
             {decodedPoet} · {poemData?.year}
           </div>
+          <ThemeToggle />
         </div>
       </nav>
 
@@ -179,7 +164,7 @@ export default async function PoemPage({ params }: PoemPageProps) {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/50 to-transparent dark:from-black dark:via-black/50" />
           <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
             <div className="max-w-4xl mx-auto">
               <h1 className="text-4xl md:text-6xl font-bold text-white mb-3 leading-tight">
@@ -194,8 +179,8 @@ export default async function PoemPage({ params }: PoemPageProps) {
       {/* Content */}
       <article className="py-12 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-3xl shadow-xl p-6 md:p-12 border border-stone-100">
-            <div className="prose prose-stone prose-lg max-w-none">
+          <div className="bg-white dark:bg-stone-900 rounded-3xl shadow-xl p-6 md:p-12 border border-stone-100 dark:border-stone-800">
+            <div className="prose prose-stone prose-lg dark:prose-invert max-w-none">
               {sections.map((section, index) => {
                 switch (section.type) {
                   case "h1":
@@ -204,7 +189,7 @@ export default async function PoemPage({ params }: PoemPageProps) {
                     return (
                       <h2
                         key={index}
-                        className="text-2xl md:text-3xl font-bold text-stone-800 mt-12 mb-6 pb-4 border-b-2 border-stone-100"
+                        className="text-2xl md:text-3xl font-bold text-stone-800 dark:text-stone-100 mt-12 mb-6 pb-4 border-b-2 border-stone-100 dark:border-stone-800"
                       >
                         {section.content}
                       </h2>
@@ -213,7 +198,7 @@ export default async function PoemPage({ params }: PoemPageProps) {
                     return (
                       <h3
                         key={index}
-                        className="text-xl md:text-2xl font-semibold text-stone-700 mt-8 mb-4"
+                        className="text-xl md:text-2xl font-semibold text-stone-700 dark:text-stone-300 mt-8 mb-4"
                       >
                         {section.content}
                       </h3>
@@ -222,32 +207,29 @@ export default async function PoemPage({ params }: PoemPageProps) {
                     return (
                       <blockquote
                         key={index}
-                        className="border-l-4 border-stone-400 pl-6 my-8 text-stone-700 italic text-xl leading-relaxed bg-stone-50 py-4 pr-4 rounded-r-lg"
+                        className="border-l-4 border-stone-400 dark:border-stone-600 pl-6 my-8 text-stone-700 dark:text-stone-300 italic text-xl leading-relaxed bg-stone-50 dark:bg-stone-800 py-4 pr-4 rounded-r-lg"
                       >
                         {section.content}
                       </blockquote>
                     );
                   case "bold":
                     return (
-                      <p
-                        key={index}
-                        className="font-semibold text-stone-800 my-6 text-xl"
-                      >
+                      <p key={index} className="font-semibold text-stone-800 dark:text-stone-200 my-6 text-xl">
                         {section.content}
                       </p>
                     );
                   case "hr":
-                    return <hr key={index} className="my-10 border-stone-200" />;
+                    return <hr key={index} className="my-10 border-stone-200 dark:border-stone-800" />;
                   case "tags":
                     const tags = section.content.match(/#([^\s#]+)/g) || [];
                     return (
-                      <div key={index} className="mt-10 pt-6 border-t border-stone-200">
-                        <h4 className="text-sm font-medium text-stone-500 mb-3">标签</h4>
+                      <div key={index} className="mt-10 pt-6 border-t border-stone-200 dark:border-stone-800">
+                        <h4 className="text-sm font-medium text-stone-500 dark:text-stone-400 mb-3">标签</h4>
                         <div className="flex flex-wrap gap-2">
                           {tags.map((tag, i) => (
                             <span
                               key={i}
-                              className="px-4 py-2 bg-stone-100 text-stone-700 text-sm rounded-full hover:bg-stone-200 transition-colors cursor-pointer"
+                              className="px-4 py-2 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-sm rounded-full hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors cursor-pointer"
                             >
                               {tag.replace("#", "")}
                             </span>
@@ -257,10 +239,7 @@ export default async function PoemPage({ params }: PoemPageProps) {
                     );
                   default:
                     return (
-                      <p
-                        key={index}
-                        className="text-stone-600 leading-relaxed my-4 text-lg"
-                      >
+                      <p key={index} className="text-stone-600 dark:text-stone-400 leading-relaxed my-4 text-lg">
                         {section.content.replace(/\*\*/g, "")}
                       </p>
                     );
@@ -269,26 +248,28 @@ export default async function PoemPage({ params }: PoemPageProps) {
             </div>
           </div>
 
-          {/* Related Links */}
           <div className="mt-8 flex justify-between items-center">
             <Link
               href={`/#${poetData?.dynasty}`}
-              className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors"
+              className="inline-flex items-center gap-2 text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H19v-2z" />
               </svg>
               返回{poetData?.dynasty}
             </Link>
-            <div className="text-stone-400 text-sm">
-              分享诗词
-            </div>
+            <ShareButtonWrapper
+              title={title}
+              author={decodedPoet}
+              dynasty={poetData?.dynasty || ""}
+              poemLines={poemLines.slice(0, 4)}
+              tags={tags}
+            />
           </div>
         </div>
       </article>
 
-      {/* Footer */}
-      <footer className="bg-stone-900 text-stone-400 py-8 px-4">
+      <footer className="bg-stone-900 dark:bg-black text-stone-400 py-8 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-sm">中华诗词 © 2026</p>
         </div>

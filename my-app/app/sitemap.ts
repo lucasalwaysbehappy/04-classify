@@ -2,6 +2,8 @@ import { readFileSync, readdirSync } from "fs";
 import { join } from "path";
 import type { MetadataRoute } from "next";
 
+export const dynamic = "force-static";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://chinese-poetry.vercel.app";
   

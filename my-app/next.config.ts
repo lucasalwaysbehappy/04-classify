@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: process.env.VERCEL ? undefined : "export",
+  distDir: process.env.VERCEL ? ".next" : "dist",
   images: {
+    unoptimized: process.env.VERCEL ? false : true,
     remotePatterns: [
       {
         protocol: "https",

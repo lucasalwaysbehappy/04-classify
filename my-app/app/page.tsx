@@ -3,6 +3,7 @@ import { join } from "path";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
+import { ThemeToggle } from "@/app/components/theme-toggle";
 
 interface Poem {
   slug: string;
@@ -60,7 +61,6 @@ export default function Home() {
     readFileSync(join(contentPath, "index.json"), "utf-8")
   ) as ContentIndex;
 
-  // Group poets by dynasty
   const poetsByDynasty = indexData.poets.reduce((acc, poet) => {
     if (!acc[poet.dynasty]) {
       acc[poet.dynasty] = [];
@@ -69,17 +69,15 @@ export default function Home() {
     return acc;
   }, {} as Record<string, Poet[]>);
 
-  // Sort dynasties by order
   const sortedDynasties = [...indexData.dynasties].sort(
     (a, b) => a.order - b.order
   );
 
-  // Calculate total poems
   const totalPoems = indexData.poets.reduce((sum, poet) => sum + poet.poems.length, 0);
   const totalPoets = indexData.poets.length;
 
   return (
-    <main className="min-h-screen bg-stone-50">
+    <main className="min-h-screen bg-stone-50 dark:bg-stone-950 transition-colors duration-300">
       {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
@@ -90,24 +88,23 @@ export default function Home() {
             name: "中华诗词",
             description: "按年代时间线品读中国古典诗词",
             url: "https://chinese-poetry.vercel.app",
-            potentialAction: {
-              "@type": "SearchAction",
-              target: "https://chinese-poetry.vercel.app/search?q={search_term_string}",
-              "query-input": "required name=search_term_string",
-            },
           }),
         }}
       />
 
-      {/* Hero Section */}
-      <header className="relative bg-gradient-to-b from-stone-900 via-stone-800 to-stone-700 text-stone-50 py-20 px-4 overflow-hidden">
-        {/* Background Pattern */}
+      {/* Header */}
+      <header className="relative bg-gradient-to-b from-stone-900 via-stone-800 to-stone-700 dark:from-black dark:via-stone-900 dark:to-stone-800 text-stone-50 py-20 px-4 overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-full h-full" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }} />
         </div>
         
+        {/* Theme Toggle */}
+        <div className="absolute top-4 right-4 z-10">
+          <ThemeToggle />
+        </div>
+
         <div className="relative max-w-6xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-wider">
             中华诗词
@@ -116,7 +113,6 @@ export default function Home() {
             穿越千年时光，品读诗词之美
           </p>
           
-          {/* Stats */}
           <div className="flex justify-center gap-8 md:gap-16 text-sm md:text-base">
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-stone-200">{totalPoets}</div>
@@ -132,7 +128,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Timeline Indicator */}
           <div className="mt-12 flex justify-center gap-2 md:gap-4 text-sm text-stone-500 flex-wrap">
             {sortedDynasties.map((dynasty, index) => (
               <span key={dynasty.name} className="flex items-center gap-2">
@@ -140,8 +135,6 @@ export default function Home() {
                 {index < sortedDynasties.length - 1 && <span className="text-stone-600">→</span>}
               </span>
             ))}
-            <span className="text-stone-600">→</span>
-            <span className="px-3 py-1 bg-stone-800/30 rounded-full text-stone-600">...</span>
           </div>
         </div>
       </header>
@@ -151,21 +144,19 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           {sortedDynasties.map((dynasty) => (
             <article key={dynasty.name} className="mb-24 scroll-mt-24" id={dynasty.name}>
-              {/* Dynasty Header */}
               <header className="flex items-center gap-6 mb-12">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-stone-800 to-stone-600 text-stone-50 flex items-center justify-center text-3xl font-bold shadow-xl">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-stone-800 to-stone-600 dark:from-stone-700 dark:to-stone-500 text-stone-50 flex items-center justify-center text-3xl font-bold shadow-xl">
                   {dynasty.name.charAt(0)}
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-4xl md:text-5xl font-bold text-stone-800 mb-2">
+                  <h2 className="text-4xl md:text-5xl font-bold text-stone-800 dark:text-stone-100 mb-2">
                     {dynasty.name}
                   </h2>
-                  <p className="text-stone-500 text-lg">{dynasty.period}</p>
+                  <p className="text-stone-500 dark:text-stone-400 text-lg">{dynasty.period}</p>
                 </div>
-                <div className="hidden md:block flex-1 h-px bg-gradient-to-r from-stone-300 to-transparent" />
+                <div className="hidden md:block flex-1 h-px bg-gradient-to-r from-stone-300 to-transparent dark:from-stone-700" />
               </header>
 
-              {/* Poets in this dynasty */}
               <div className="space-y-16">
                 {poetsByDynasty[dynasty.name]
                   ?.sort((a, b) => {
@@ -176,12 +167,11 @@ export default function Home() {
                   .map((poet) => (
                     <section
                       key={poet.name}
-                      className="bg-white rounded-3xl shadow-lg overflow-hidden border border-stone-100"
+                      className="bg-white dark:bg-stone-900 rounded-3xl shadow-lg overflow-hidden border border-stone-100 dark:border-stone-800"
                     >
-                      {/* Poet Header */}
-                      <header className="bg-gradient-to-r from-stone-50 to-white px-8 py-6 border-b border-stone-100">
+                      <header className="bg-gradient-to-r from-stone-50 to-white dark:from-stone-800 dark:to-stone-900 px-8 py-6 border-b border-stone-100 dark:border-stone-800">
                         <div className="flex items-center gap-5">
-                          <div className="relative w-16 h-16 rounded-full overflow-hidden ring-3 ring-stone-200 shadow-md">
+                          <div className="relative w-16 h-16 rounded-full overflow-hidden ring-3 ring-stone-200 dark:ring-stone-700 shadow-md">
                             <Image
                               src={poet.avatar}
                               alt={`${poet.name}头像`}
@@ -192,41 +182,30 @@ export default function Home() {
                             />
                           </div>
                           <div className="flex-1">
-                            <h3 className="text-2xl md:text-3xl font-bold text-stone-800">
+                            <h3 className="text-2xl md:text-3xl font-bold text-stone-800 dark:text-stone-100">
                               {poet.name}
                             </h3>
-                            <p className="text-stone-500">
+                            <p className="text-stone-500 dark:text-stone-400">
                               {poet.lifePeriod} · {poet.poems.length}首作品
                             </p>
                           </div>
-                          <div className="text-stone-300">
-                            <svg
-                              className="w-8 h-8"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={1.5}
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
+                          <div className="text-stone-300 dark:text-stone-600">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           </div>
                         </div>
                       </header>
 
-                      {/* Poems Timeline */}
                       <div className="p-8">
                         <div className="flex items-center gap-3 mb-8">
-                          <div className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center">
-                            <svg className="w-4 h-4 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+                            <svg className="w-4 h-4 text-stone-500 dark:text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           </div>
-                          <span className="text-stone-600 font-medium">创作时间线</span>
-                          <div className="flex-1 h-px bg-stone-200" />
+                          <span className="text-stone-600 dark:text-stone-400 font-medium">创作时间线</span>
+                          <div className="flex-1 h-px bg-stone-200 dark:bg-stone-700" />
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -238,7 +217,7 @@ export default function Home() {
                                 href={`/poem/${encodeURIComponent(poet.name)}/${encodeURIComponent(poem.slug)}`}
                                 className="group block"
                               >
-                                <article className="bg-stone-50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-stone-100">
+                                <article className="bg-stone-50 dark:bg-stone-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-stone-100 dark:border-stone-700">
                                   <div className="relative h-48 overflow-hidden">
                                     <Image
                                       src={poem.image}
@@ -248,26 +227,22 @@ export default function Home() {
                                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                                    
-                                    {/* Year badge */}
                                     <time className="absolute top-3 left-3 bg-stone-900/80 backdrop-blur-sm text-stone-100 px-3 py-1 rounded-full text-xs font-medium">
                                       {poem.year}
                                     </time>
-                                    
                                     <h4 className="absolute bottom-3 left-3 right-3 text-white text-xl font-bold leading-tight line-clamp-2">
                                       {poem.title}
                                     </h4>
                                   </div>
-                                  
                                   <div className="p-5">
-                                    <p className="text-stone-500 text-sm mb-4 line-clamp-1">
+                                    <p className="text-stone-500 dark:text-stone-400 text-sm mb-4 line-clamp-1">
                                       {poem.period}
                                     </p>
                                     <div className="flex flex-wrap gap-2">
                                       {poem.tags.slice(0, 3).map((tag) => (
                                         <span
                                           key={tag}
-                                          className="px-3 py-1 bg-white text-stone-600 text-xs rounded-full border border-stone-200"
+                                          className="px-3 py-1 bg-white dark:bg-stone-700 text-stone-600 dark:text-stone-300 text-xs rounded-full border border-stone-200 dark:border-stone-600"
                                         >
                                           {tag}
                                         </span>
@@ -288,7 +263,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-stone-900 text-stone-400 py-12 px-4">
+      <footer className="bg-stone-900 dark:bg-black text-stone-400 py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="text-center md:text-left">
@@ -303,7 +278,7 @@ export default function Home() {
               <a href="#宋代" className="hover:text-stone-200 transition-colors">宋代</a>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-stone-800 text-center text-sm">
+          <div className="mt-8 pt-8 border-t border-stone-800 dark:border-stone-800 text-center text-sm">
             <p>中华诗词 © 2026 | 按年代时间线展示</p>
           </div>
         </div>
