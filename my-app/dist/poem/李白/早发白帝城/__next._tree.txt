@@ -1,0 +1,4 @@
+:HL["/_next/static/chunks/fe24b1ea180fe4bd.css","style"]
+:HL["/_next/static/chunks/0b9c3f78aad7de07.css","style"]
+:HL["/_next/static/media/f112ed7f0b91582f-s.p.12569d31.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+0:{"buildId":"fIRrc1WVNr-R8hPHDNt84","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"poem","paramType":null,"paramKey":"poem","hasRuntimePrefetch":false,"slots":{"children":{"name":"poet","paramType":"d","paramKey":"%E6%9D%8E%E7%99%BD","hasRuntimePrefetch":false,"slots":{"children":{"name":"poem","paramType":"d","paramKey":"%E6%97%A9%E5%8F%91%E7%99%BD%E5%B8%9D%E5%9F%8E","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}
