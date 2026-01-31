@@ -6,6 +6,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { ThemeToggle } from "@/app/components/theme-toggle";
 import { ShareButtonWrapper } from "./share-button-wrapper";
+import { PoemReaderWrapper } from "./poem-reader-wrapper";
 
 interface PoemPageProps {
   params: Promise<{
@@ -179,6 +180,15 @@ export default async function PoemPage({ params }: PoemPageProps) {
       {/* Content */}
       <article className="py-12 px-4">
         <div className="max-w-4xl mx-auto">
+          {/* 朗读功能 */}
+          <div className="mb-6">
+            <PoemReaderWrapper
+              content={poemLines}
+              title={title}
+              author={decodedPoet}
+            />
+          </div>
+
           <div className="bg-white dark:bg-stone-900 rounded-3xl shadow-xl p-6 md:p-12 border border-stone-100 dark:border-stone-800">
             <div className="prose prose-stone prose-lg dark:prose-invert max-w-none">
               {sections.map((section, index) => {
