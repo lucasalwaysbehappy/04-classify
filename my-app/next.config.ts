@@ -1,14 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: process.env.VERCEL ? undefined : "export",
-  distDir: process.env.VERCEL ? ".next" : "dist",
+  // 启用服务端渲染以支持 Clerk 认证
   images: {
-    unoptimized: process.env.VERCEL ? false : true,
     remotePatterns: [
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "img.clerk.com",
       },
     ],
   },

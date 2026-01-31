@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { ThemeToggle } from "@/app/components/theme-toggle";
+import { UserNav } from "@/app/components/user-nav";
 import { ShareButtonWrapper } from "./share-button-wrapper";
 import { PoemReaderWrapper } from "./poem-reader-wrapper";
 import { FadeIn, ScrollReveal, HoverScale } from "@/app/components/animations";
@@ -149,6 +150,7 @@ export default async function PoemPage({ params }: PoemPageProps) {
           <div className="text-sm text-stone-400">
             {decodedPoet} · {poemData?.year}
           </div>
+          <UserNav />
           <ThemeToggle />
         </div>
       </nav>

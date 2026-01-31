@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Serif_SC } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./components/theme-provider";
+import { AuthProvider } from "./components/auth-provider";
 
 const notoSerifSC = Noto_Serif_SC({
   variable: "--font-noto-serif-sc",
@@ -24,9 +25,11 @@ export default function RootLayout({
       <body
         className={`${notoSerifSC.variable} antialiased bg-stone-50 text-stone-800 dark:bg-stone-950 dark:text-stone-100 transition-colors duration-300`}
       >
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

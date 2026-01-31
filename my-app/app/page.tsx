@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { ThemeToggle } from "@/app/components/theme-toggle";
+import { UserNav } from "@/app/components/user-nav";
 import { FadeIn, ScrollReveal, StaggerContainer, StaggerItem, HoverScale } from "@/app/components/animations";
 
 interface Poem {
@@ -101,7 +102,8 @@ export default function Home() {
           }} />
         </div>
         
-        <div className="absolute top-4 right-4 z-10">
+        <div className="absolute top-4 right-4 z-10 flex items-center gap-3">
+          <UserNav />
           <ThemeToggle />
         </div>
 
@@ -294,6 +296,8 @@ export default function Home() {
                 <a href="#唐代" className="hover:text-stone-200 transition-colors">唐代</a>
                 <span className="text-stone-600">·</span>
                 <a href="#宋代" className="hover:text-stone-200 transition-colors">宋代</a>
+                <span className="text-stone-600">·</span>
+                <Link href="/favorites" className="hover:text-stone-200 transition-colors">我的收藏</Link>
               </div>
             </div>
             <div className="mt-8 pt-8 border-t border-stone-800 dark:border-stone-800 text-center text-sm">
