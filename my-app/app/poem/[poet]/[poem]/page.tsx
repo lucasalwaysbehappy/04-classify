@@ -8,6 +8,7 @@ import { ThemeToggle } from "@/app/components/theme-toggle";
 import { UserNav } from "@/app/components/user-nav";
 import { ShareButtonWrapper } from "./share-button-wrapper";
 import { PoemReaderWrapper } from "./poem-reader-wrapper";
+import { FavoriteButtonWrapper } from "./favorite-button-wrapper";
 import { FadeIn, ScrollReveal, HoverScale } from "@/app/components/animations";
 
 interface PoemPageProps {
@@ -259,7 +260,7 @@ export default async function PoemPage({ params }: PoemPageProps) {
           </ScrollReveal>
 
           <ScrollReveal delay={0.2}>
-            <div className="mt-8 flex justify-between items-center">
+            <div className="mt-8 flex flex-wrap gap-4 justify-between items-center">
               <Link
                 href={`/#${poetData?.dynasty}`}
                 className="inline-flex items-center gap-2 text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 transition-colors"
@@ -269,13 +270,20 @@ export default async function PoemPage({ params }: PoemPageProps) {
                 </svg>
                 返回{poetData?.dynasty}
               </Link>
-              <ShareButtonWrapper
-                title={title}
-                author={decodedPoet}
-                dynasty={poetData?.dynasty || ""}
-                poemLines={poemLines.slice(0, 4)}
-                tags={tags}
-              />
+              <div className="flex gap-3">
+                <FavoriteButtonWrapper
+                  poemSlug={decodedPoem}
+                  poetName={decodedPoet}
+                  poemTitle={title}
+                />
+                <ShareButtonWrapper
+                  title={title}
+                  author={decodedPoet}
+                  dynasty={poetData?.dynasty || ""}
+                  poemLines={poemLines.slice(0, 4)}
+                  tags={tags}
+                />
+              </div>
             </div>
           </ScrollReveal>
         </div>
